@@ -1,4 +1,4 @@
-// require("dotenv").config();
+require("dotenv").config();
 
 const express = require("express");
 
@@ -8,7 +8,8 @@ const { errors } = require("celebrate");
 
 // const cors = require("cors");
 
-// const helmet = require("helmet");
+const helmet = require("helmet");
+const limiter = require("./middlewares/rateLimiter");
 
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
@@ -26,7 +27,8 @@ const app = express();
 // подключаем логгер запросов
 app.use(requestLogger);
 
-// app.use(helmet());
+app.use(helmet());
+app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

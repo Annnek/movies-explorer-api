@@ -6,7 +6,7 @@ const {
   deleteMovie,
 } = require("../controllers/movies");
 
-const { createMovieJoi, deleteMovieJoi } = require("../middlewares/celebrate");
+const { createMovieJoi, deleteMovieJoi } = require("../middlewares/validation");
 
 moviesRouter.get("/", getMovies);
 moviesRouter.post("/", createMovieJoi, createMovie);

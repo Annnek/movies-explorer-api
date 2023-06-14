@@ -1,11 +1,12 @@
 const bcrypt = require("bcryptjs"); // Добавляем модуль bcryptjs для хеширования пароля
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+
 const { JWT_SECRET, NODE_ENV } = require("../utils/config");
+
 const BadRequestError = require("../errors/BadRequestError");
 const ConflictError = require("../errors/ConflictError");
 const NotFoundError = require("../errors/NotFoundError");
-const UnauthorizedError = require("../errors/UnauthorizedError");
 
 // Контроллер для регистрации юзера
 function registrationUser(req, res, next) {
@@ -20,15 +21,14 @@ function registrationUser(req, res, next) {
         name,
       }),
     )
-    .then((user) => {
-      const { _id } = user;
-
-      return res.status(201).send({
-        email,
-        name,
-        _id,
-      });
-    })
+    .then(() =>
+      res.status(201).send({
+        data: {
+          name,
+          email,
+        },
+      }),
+    )
     .catch((err) => {
       if (err.code === 11000) {
         next(
@@ -50,18 +50,15 @@ function loginUser(req, res, next) {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then(({ _id: userId }) => {
-      if (userId) {
-        const token = jwt.sign(
-          { userId },
-          NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
-          {
-            expiresIn: "7d",
-          },
-        );
-        return res.send({ token });
-      }
-      throw new UnauthorizedError("Неправильные почта или пароль");
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+        {
+          expiresIn: "7d",
+        },
+      );
+      res.send({ token });
     })
     .catch(next);
 }

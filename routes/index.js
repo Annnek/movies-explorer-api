@@ -8,7 +8,7 @@ const { loginUser, registrationUser } = require("../controllers/users");
 const {
   loginUserJoi,
   registrationUserJoi,
-} = require("../middlewares/celebrate");
+} = require("../middlewares/validation");
 
 const authMiddleware = require("../middlewares/auth");
 
