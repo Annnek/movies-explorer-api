@@ -17,8 +17,9 @@ const routes = require("./routes/index");
 
 const errorHandler = require("./middlewares/errorHandler");
 
-const { PORT = 3000 } = process.env;
-mongoose.connect("mongodb://127.0.0.1:27017/bitfilmsdb");
+const { PORT, MONGO_URL } = require("./utils/config");
+
+mongoose.connect(MONGO_URL);
 
 const app = express();
 
