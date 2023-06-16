@@ -4,24 +4,21 @@ const ForbiddenError = require("../errors/ForbiddenError");
 const NotFoundError = require("../errors/NotFoundError");
 
 const getMovies = (req, res, next) => {
-  Movie.find({})
+  const { _id } = req.user;
+  Movie.find({ owner: _id })
     .then((movies) => res.status(200).send(movies))
     .catch(next);
 };
 
 const createMovie = (req, res, next) => {
-  // const { name, link } = req.body;
-  // const { userId } = req.user;
-  // console.log(req.user); // _id станет доступен
-
   Movie.create({ ...req.body, owner: req.user._id })
     .then((movie) => res.status(201).send(movie))
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(
           new BadRequestError(
-            "Переданы некорректные данные при создании фильма"
-          )
+            "Переданы некорректные данные при создании фильма",
+          ),
         );
       } else {
         next(err);
@@ -30,8 +27,6 @@ const createMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  // const { cardId } = req.params;
-  // const { userId } = req.user; // Идентификатор текущего пользователя
   const currentUserId = req.user._id;
   const movieId = req.params._id;
 

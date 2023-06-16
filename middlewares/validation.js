@@ -15,15 +15,8 @@ const loginUserJoi = celebrate({
 const registrationUserJoi = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(6),
-    name: Joi.string().min(2).max(30),
-  }),
-});
-
-// Схема для валидации параметров запроса getUserById
-const getUserByIdJoi = celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().length(24).hex().required(),
+    password: Joi.string().required(),
+    name: Joi.string().required().min(2).max(30),
   }),
 });
 
@@ -62,7 +55,6 @@ const deleteMovieJoi = celebrate({
 module.exports = {
   loginUserJoi,
   registrationUserJoi,
-  getUserByIdJoi,
   updateProfileUserJoi,
   createMovieJoi,
   deleteMovieJoi,

@@ -7,6 +7,7 @@ const { JWT_SECRET, NODE_ENV } = require("../utils/config");
 const BadRequestError = require("../errors/BadRequestError");
 const ConflictError = require("../errors/ConflictError");
 const NotFoundError = require("../errors/NotFoundError");
+const UnauthorizedError = require("../errors/UnauthorizedError");
 
 // Контроллер для регистрации юзера
 function registrationUser(req, res, next) {
@@ -16,19 +17,20 @@ function registrationUser(req, res, next) {
     .hash(password, 10)
     .then((hash) =>
       User.create({
+        name,
         email,
         password: hash,
+      }),
+    )
+    .then((user) => {
+      const { _id } = user;
+
+      return res.status(201).send({
+        email,
         name,
-      }),
-    )
-    .then(() =>
-      res.status(201).send({
-        data: {
-          name,
-          email,
-        },
-      }),
-    )
+        _id,
+      });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         next(
@@ -50,44 +52,47 @@ function loginUser(req, res, next) {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
-        {
-          expiresIn: "7d",
-        },
-      );
-      res.send({ token });
+    .then(({ _id: userId }) => {
+      if (userId) {
+        const token = jwt.sign(
+          { userId },
+          NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+          {
+            expiresIn: "7d",
+          },
+        );
+        return res.send({ token });
+      }
+      throw new UnauthorizedError("Неправильные почта или пароль");
     })
     .catch(next);
 }
 
 // Поиск юзера по id
-const getUserById = (req, res, next) => {
-  const { userId } = req.params;
+const getUserInfo = (req, res, next) => {
+  const { userId } = req.user;
   User.findById(userId)
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError("Пользователь с таким id не найден");
-      }
-      res.send(user);
+      if (user) return res.send(user);
+      throw new NotFoundError("Пользователь с таким id не найден");
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return next(new BadRequestError("Неправильный id"));
+        next(new BadRequestError("Некорректный id"));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
 // Контроллер для обновления профиля
 const updateProfileUser = (req, res, next) => {
   const { userId } = req.user;
-  const { name, about } = req.body;
+  const { name, email } = req.body;
+
   User.findByIdAndUpdate(
     userId,
-    { name, about },
+    { name, email },
     { new: true, runValidators: true },
   )
     .then((user) => {
@@ -110,6 +115,6 @@ const updateProfileUser = (req, res, next) => {
 module.exports = {
   registrationUser,
   loginUser,
-  getUserById,
+  getUserInfo,
   updateProfileUser,
 };
