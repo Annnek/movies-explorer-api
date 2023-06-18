@@ -100,7 +100,9 @@ const updateProfileUser = (req, res, next) => {
       throw new NotFoundError("Пользователь с таким id не найден");
     })
     .catch((err) => {
-      if (err.name === "ValidationError" || err.name === "CastError") {
+      if (err.code === 11000) {
+        next(new ConflictError("Такой пользователь уже существует"));
+      } else if (err.name === "ValidationError") {
         next(
           new BadRequestError(
             "Переданы некорректные данные при обновлении профиля пользователя",
