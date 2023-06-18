@@ -52,10 +52,10 @@ function loginUser(req, res, next) {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
-    .then(({ _id: userId }) => {
-      if (userId) {
+    .then(({ _id }) => {
+      if (_id) {
         const token = jwt.sign(
-          { userId },
+          { _id },
           NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
           {
             expiresIn: "7d",
@@ -70,8 +70,8 @@ function loginUser(req, res, next) {
 
 // Поиск юзера по id
 const getUserInfo = (req, res, next) => {
-  const { userId } = req.user;
-  User.findById(userId)
+  const { _id } = req.user;
+  User.findById(_id)
     .then((user) => {
       if (user) return res.send(user);
       throw new NotFoundError("Пользователь с таким id не найден");
@@ -87,11 +87,11 @@ const getUserInfo = (req, res, next) => {
 
 // Контроллер для обновления профиля
 const updateProfileUser = (req, res, next) => {
-  const { userId } = req.user;
+  const { _id } = req.user;
   const { name, email } = req.body;
 
   User.findByIdAndUpdate(
-    userId,
+    _id,
     { name, email },
     { new: true, runValidators: true },
   )
