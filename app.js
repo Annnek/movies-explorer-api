@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 
 const { errors } = require("celebrate");
 
-// const cors = require("cors");
+const cors = require("cors");
 
 const helmet = require("helmet");
 const limiter = require("./middlewares/rateLimiter");
@@ -23,7 +23,7 @@ mongoose.connect(MONGO_URL);
 
 const app = express();
 
-// app.use(cors());
+app.use(cors());
 
 // подключаем логгер запросов
 app.use(requestLogger);
