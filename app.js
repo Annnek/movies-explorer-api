@@ -1,6 +1,6 @@
-require("dotenv").config();
-
 // import cors from "./utils/cors";
+
+require("dotenv").config();
 
 const express = require("express");
 
@@ -8,9 +8,11 @@ const mongoose = require("mongoose");
 
 const { errors } = require("celebrate");
 
-// const cors = require("cors");
-
 const helmet = require("helmet");
+
+// const cors = require("cors");
+const cors = require("./utils/cors");
+
 const limiter = require("./middlewares/rateLimiter");
 
 const { requestLogger, errorLogger } = require("./middlewares/logger");
@@ -25,7 +27,7 @@ mongoose.connect(MONGO_URL);
 
 const app = express();
 
-// app.use(cors);
+app.use(cors);
 
 // подключаем логгер запросов
 app.use(requestLogger);
