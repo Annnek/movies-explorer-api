@@ -8,8 +8,8 @@ const { errors } = require("celebrate");
 
 const helmet = require("helmet");
 
-// const cors = require("cors");
-const { cors } = require("./utils/cors");
+const cors = require("cors");
+// const { cors } = require("./utils/cors");
 
 const limiter = require("./middlewares/rateLimiter");
 
@@ -25,25 +25,25 @@ mongoose.connect(MONGO_URL);
 
 const app = express();
 
-app.use(cors);
+// app.use(cors);
 
-// const allowedCors = [
-//   "https://bestfilms.nomoredomains.rocks",
-//   "http://bestfilms.nomoredomains.rocks",
-//   "localhost:3000",
-//   "http://localhost",
-//   "http://localhost:3001",
-//   "http://localhost:3000",
-// ];
+const allowedCors = [
+  "https://bestfilms.nomoredomains.rocks",
+  "http://bestfilms.nomoredomains.rocks",
+  "localhost:3000",
+  "http://localhost",
+  "http://localhost:3001",
+  "http://localhost:3000",
+];
 
-// const corsOptions = {
-//   origin: allowedCors,
-//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//   allowedHeaders: ["Content-Type", "Authorization"],
-//   optionsSuccessStatus: 204,
-// };
+const corsOptions = {
+  origin: allowedCors,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204,
+};
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // подключаем логгер запросов
 app.use(requestLogger);
