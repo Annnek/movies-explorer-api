@@ -25,7 +25,7 @@ mongoose.connect(MONGO_URL);
 
 const app = express();
 
-// app.use(cors);
+// app.use(cors());
 
 const allowedCors = [
   "https://bestfilms.nomoredomains.rocks",
@@ -38,6 +38,8 @@ const allowedCors = [
 
 const corsOptions = {
   origin: allowedCors,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
   credentials: true,
 };
